@@ -59,6 +59,12 @@ WEB_DOMAIN=*.mydomain.com
 ```
 ## Some explanation
 The developer chose to separate docker-compose between folders, with .env separated, to allow the build of services one by one and to prevent files being oerwritten by mistake.
+<BR> The services built are :
+* iPg : postgresql, pgadmin4
+* iNginx : nginx (as a proxy server), swagger, php
+* iNginx/certbot : Let's encrypt certbot for SSL certification
+* iKeycloak : keycloak
+* iHedgedoc  : hedgedoc
 ## Let's go
 The first docker you need to build is iPg and siblings. Go to ipg and build it.
 Replace each .env at the root of the service folder.
