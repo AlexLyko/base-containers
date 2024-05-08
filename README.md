@@ -65,6 +65,10 @@ The developer chose to separate docker-compose between folders, with .env separa
 * iNginx/certbot : Let's encrypt certbot for SSL certification
 * iKeycloak : keycloak
 * iHedgedoc  : hedgedoc
+And these services have to obey some rules :
+- only OAuth is admitted (using iKeycloak)
+- all data are persitent : stored outsite the docker, so in a volume or in the PG database through a common PG service (iPg)
+- everything belongs in the network iNetwork, defined in the first docker you have to launch : iPg.
 ## Let's go
 The first docker you need to build is iPg and siblings. Go to ipg and build it.
 Replace each .env at the root of the service folder.
