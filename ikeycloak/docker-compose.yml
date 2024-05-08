@@ -1,0 +1,30 @@
+version: '3.8'
+# iNetwork MUST have been initialized using ../iPg/docker-compose.yml
+# Keycloak service uses external PG DB
+networks:
+    iNetwork:
+        external: true
+services:   
+   iKeycloak:
+      image: quay.io/keycloak/keycloak:24.0
+      container_name : iKeycloak
+      environment:
+        KEYCLOAK_ADMIN: ${KC_USER}
+        KEYCLOAK_ADMIN_PASSWORD: ${KC_PWD}
+        KC_DB: postgres
+        KC_DB_URL_HOST: ${PG_HOST}
+        KC_DB_URL_DATABASE: ${PG_DB}
+        KC_DB_USERNAME:  ${PG_USER}
+        KC_DB_PASSWORD:  ${PG_PWD}
+        KC_DB_SCHEMA: public
+      volumes:
+         - ./data/:/opt/keycloak/data/h2/
+      ports:
+         - ${KC_PORT}:8080
+      networks:
+         - iNetwork
+      command: 
+         - start
+         - --proxy=edge
+         - --hostname-strict=false
+         - --hostname-strict-https=false

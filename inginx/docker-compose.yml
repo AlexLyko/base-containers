@@ -1,0 +1,72 @@
+version: '3.8'
+# iNetwork MUST have been initialized using ../iPg/docker-compose.yml
+# By default, you can put exposed web pages (*.php, *.html) in this folder, it would be accessible through yourdomain.com/yourfile.
+# NGinx is used as a proxy server. Ports 443 and 80 are supposed to be opened and nginx listens at them.
+# - core.conf : general settings
+# - proxy.conf : additional parameters for ssl and proxy config
+# NB. As you'll see by youself, core.conf and proxy.conf are not published  here, for security issues.
+# You'll find some examples in websites like : https://phoenixnap.com/kb/docker-nginx-reverse-proxy
+# Classical use is :
+# 1. create a docker for each new app
+# 2. create a .conf file in the nginx conf volume, using the exemples given
+# 3. link the file with a new volume. It is STRONGLY recommanded to link each file, and not the whole folder, here (otherwise you'll be flooded with overloaded instructions in each conf file).
+# U'll see by yourself through many examples, that using a subdomain (myappname.mydomain.com) is REALLY easier than using a folder (mydomain.com/myappname).
+# PHP is set in a different docker, 'cause we want to use only certified images here, and to avoid the use of locally generated images.
+# A main goal here is the exposition of APIs, so Swagger is part of the initial distribution. 
+# Add openapiX.json files to describe new APIs. Swagger will discover them by itself.
+# @future_me : look at your laziness, you get a "latest" tag here. Don't be too harsh, the exposition of the public image is not really clear.
+# Let's encrypt is proposed here, using certbot through a shared volume.
+# @future_me : don't forget U can use wildcards (*.mydomain.com).
+networks:
+    iNetwork:
+        external: true
+services:
+   iNginx:
+      container_name: iNginx
+      restart: always
+      image: nginx:1.25
+      ports:
+           - 80:80
+           - 443:443
+      networks:
+           - iNetwork
+      volumes:
+           - ./data:/var/www/html
+           - ./conf/core.conf:/etc/nginx/conf.d/core.conf
+           - ./conf/proxy.conf:/etc/nginx/conf.d/proxy.conf
+           - ./conf/php.conf:/etc/nginx/conf.d/php.conf
+           - ./conf/pgadmin4.conf:/etc/nginx/conf.d/pgadmin4.conf
+           - ./conf/keycloak.conf:/etc/nginx/conf.d/keycloak.conf
+           - ./conf/hedgedoc.conf:/etc/nginx/conf.d/hedgedoc.conf
+           - ./conf/swagger.conf:/etc/nginx/conf.d/swagger.conf
+           - /etc/letsencrypt:/etc/letsencrypt
+           - ./certbot/conf:/etc/letsencrypt_s
+           - ./certbot/www:/var/www/certbot
+   iPhp:
+      container_name: iPhp
+      image: php:8-fpm
+      volumes:
+         - iNginx-data:/var/www/html
+      networks:
+         - iNetwork
+
+   iSwagger:
+      image: swaggerapi/swagger-ui:latest
+      container_name: iSwagger
+      ports:
+            - "${SWAGGER_PORT}:8080"
+      volumes:
+            - ./swagger/openapi.json:/openapi.json
+            - ./swagger/openapi2.json:/openapi2.json
+      environment:
+            SWAGGER_JSON: /openapi.json
+    networks:
+      - iNetwork
+
+volumes:
+  iNginx-data: 
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./data

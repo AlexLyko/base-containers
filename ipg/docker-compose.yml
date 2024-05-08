@@ -1,0 +1,39 @@
+version: 'dcoker 3.8'
+# Be aware that this part initiate the local (docker "external") network.
+# So, you better have to build these containers IN THE FIRST PLACE.
+# That sounds logical, 'cause the vast majority of the other services relies on the PG service.
+# Don't forget to update the .env file.
+# PG default user is "postgres".
+# shm_size should is the total amount of the RAM allocated to the container processes, to be written alongside postgresql.conf specification.
+# @future me : take care on updating this file, especially the volumes, docker compose can be "not so reliable" about file integrity. And can overwrite your db. With all yout blood n sweat in it.
+# @future me : pgAdmin is usually the better boy, if it fails see your DNS or go back to school.
+networks:
+    iNetwork:
+        name: iNetwork
+services:
+   iPg:
+        image: postgres:16.2
+        container_name: iPg
+        shm_size: 2gb
+        volumes:
+           - ./src/init-multi-postgres-databases.sh:/docker-entrypoint-initdb.d/init-multi-postgres-databases.sh
+           - ./data/pg:/var/lib/postgresql/data
+        environment:
+           - POSTGRES_PASSWORD=${PG_PWD}
+           - POSTGRES_MULTIPLE_DATABASES=${PG_MULTI}
+        restart: always
+        networks:
+           - iNetwork
+   iPgAdmin:
+         image: dpage/pgadmin4:8.5
+         container_name: iPgAdmin
+         ports:
+            - "${PGA_PORT}:80"
+         depends_on:
+            - iPg
+         environment:
+            PGADMIN_DEFAULT_EMAIL: ${PGA_USER}
+            PGADMIN_DEFAULT_PASSWORD: ${PG_PWD}
+         restart: always
+         networks:
+            - iNetwork

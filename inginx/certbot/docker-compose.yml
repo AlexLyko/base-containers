@@ -1,0 +1,15 @@
+version: '3.8'
+# Certbot docker can be launched every 3 monthes, using crontab.
+networks:
+    iNetwork:
+        driver: bridge
+services:
+   iCertbot:
+      image: certbot/certbot
+      container_name: iCertbot
+      volumes: 
+         - ./www:/var/www/certbot:rw
+         - ./conf:/etc/letsencrypt:rw
+      networks:
+           - iNetwork
+      command: certonly --webroot -w /var/www/certbot --force-renewal --email ${MAIL_CERTBOT} -d ${WEB_DOMAIN} -d www.${WEB_DOMAIN} --agree-tos

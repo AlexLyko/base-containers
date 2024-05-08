@@ -1,0 +1,39 @@
+version: '3.8'
+# iNetwork MUST have been initialized using ../iPg/docker-compose.yml
+# Hedgedoc service uses external PG DB and keycloak OAuth service
+networks:
+    iNetwork:
+        external: true
+services:
+   iHedgedoc:
+        image: quay.io/hedgedoc/hedgedoc:1.9.9
+        container_name : iHedgedoc
+        environment:
+          - NODE_ENV=production
+          - CMD_DB_URL=postgres://${PG_USER}:${PG_PWD}@${PG_HOST}:${PG_PORT}/${PG_DB}
+          - CMD_DB_USERNAME=${PG_USER}
+          - CMD_DB_PASSWORD=${PG_PWD}
+          - CMD_DB_DATABASE=${PG_DB}
+          - CMD_DB_HOST=${PG_HOST}
+          - CMD_DOMAIN=${HD_DOMAIN}.${URL_DNS}
+          - CMD_URL_ADDPORT=false
+          - CMD_EMAIL=false
+          - CMD_ALLOW_EMAIL_REGISTER=false
+          - CMD_PROTOCOL_USESSL=true
+          - CMD_OAUTH2_USER_PROFILE_URL=https://${KC_DNS}.${URL_DNS}/realms/${KC_REALM}/protocol/openid-connect/userinfo
+          - CMD_OAUTH2_USER_PROFILE_USERNAME_ATTR=preferred_username
+          - CMD_OAUTH2_USER_PROFILE_DISPLAY_NAME_ATTR=name
+          - CMD_OAUTH2_USER_PROFILE_EMAIL_ATTR=email
+          - CMD_OAUTH2_TOKEN_URL=https://${KC_DNS}.${URL_DNS}/realms/${KC_REALM}/protocol/openid-connect/token
+          - CMD_OAUTH2_AUTHORIZATION_URL=https://${KC_DNS}.${URL_DNS}/realms/${KC_REALM}/protocol/openid-connect/auth
+          - CMD_OAUTH2_CLIENT_ID=${KC_CLIENT}
+          - CMD_OAUTH2_CLIENT_SECRET=${KC_SECRET}
+          - CMD_OAUTH2_PROVIDERNAME=Keycloak
+          - CMD_OAUTH2_SCOPE=openid email profile
+        volumes:
+           - ./uploads:/hedgedoc/public/upload
+        ports:
+           - ${HD_PORT}:3000
+        restart: always
+        networks:
+           - iNetwork
