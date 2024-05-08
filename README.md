@@ -28,10 +28,12 @@ Some base docker containers, the simplest is the better. Call it with Docker com
 <br>│   │    ├── upload
 
 This structure MUST be kept, otherwise you'll need to update all the volumes assignation in docker-compose files.
+NB : You have to create your own .env files.
 ## Some explanation
 The developer chose to separate docker-compose between folders, with .env separated, to allow the build of services one by one and to prevent files being oerwritten by mistake.
 ## Let's go
 The first docker you need to build is iPg and siblings. Go to ipg and build it.
+Replace each .env at the root of the service folder.
 ``` ssh
 cd ipg
 docker-compose -up -d
