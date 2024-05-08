@@ -53,6 +53,8 @@ URL_DNS=mydomain.com
 KC_DNS=keycloak
 KC_SECRET=XXXX
 KC_CLIENT=XXXX
+MAIL_CERTBOT=user@user.com
+WEB_DOMAIN=*.mydomain.com
 ```
 ## Some explanation
 The developer chose to separate docker-compose between folders, with .env separated, to allow the build of services one by one and to prevent files being oerwritten by mistake.
