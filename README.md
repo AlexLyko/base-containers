@@ -16,6 +16,7 @@ Some base docker containers, the simplest is the better. Call it with Docker com
 <br>│   │    │    │ *.conf
 <br>│   │    ├── certbot
 <br>│   │    │    │  docker-compose.yml
+<br>│   │    │    │  .env
 <br>│   │    │    ├── conf
 <br>│   │    │    ├── www
 <br>│   ├── keycloak
