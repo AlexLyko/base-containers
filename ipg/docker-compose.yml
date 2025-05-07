@@ -1,4 +1,4 @@
-version: 'dcoker 3.8'
+version: 'docker 3.8'
 # Be aware that this part initiate the local (docker "external") network.
 # So, you better have to build these containers IN THE FIRST PLACE.
 # That sounds logical, 'cause the vast majority of the other services relies on the PG service.
